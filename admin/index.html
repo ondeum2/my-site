@@ -72,10 +72,10 @@
     <div class="stat"><b id="nWait">0</b><span>도착 기다리는 요청</span></div>
   </div>
   <div class="filters" id="filters">
-    <button type="button" data-f="new" class="on">접수 전</button>
+    <button type="button" data-f="new">접수 전</button>
     <button type="button" data-f="wait">도착 대기</button>
     <button type="button" data-f="done">도착 완료</button>
-    <button type="button" data-f="all">전체</button>
+    <button type="button" data-f="all" class="on">전체</button>
   </div>
   <p class="err" id="appErr" hidden></p>
   <div id="list"></div>
@@ -88,12 +88,12 @@ const won = (n) => n == null ? '' : `${Number(n).toLocaleString('ko-KR')}원`;
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const when = (iso) => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 let rows = [];
-let filter = 'new';
+let filter = 'all';
 
 const pw = () => sessionStorage.getItem('adminPw') || '';
 
-async function api(method, body) {
-  const r = await fetch('/api/admin', {
+async function api(method, body, query = '') {
+  const r = await fetch('/api/admin' + query, {
     method,
     headers: { 'x-admin-password': pw(), ...(body ? { 'Content-Type': 'application/json' } : {}) },
     body: body ? JSON.stringify(body) : undefined,
@@ -183,7 +183,7 @@ $('list').addEventListener('click', async (e) => {
     if (!yes) return;
     yes.disabled = true;
     try {
-      await api('DELETE', { id: Number(row.dataset.id) });
+      await api('DELETE', { id: Number(row.dataset.id) }, '?id=' + Number(row.dataset.id));
       await load();
     } catch (ex) {
       if (ex.message) { $('appErr').textContent = ex.message; $('appErr').hidden = false; }
