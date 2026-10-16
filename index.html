@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>발주서 도우미</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <!-- 잠금 화면 -->
+  <section id="lock" class="lock" hidden>
+    <form id="lockForm" class="lock-card" autocomplete="off">
+      <h1 class="brand-lg">발주서 도우미</h1>
+      <p class="muted">비밀번호를 넣으면 열려요.</p>
+      <label class="field">
+        <span>비밀번호</span>
+        <input id="lockPw" type="password" required autocomplete="current-password">
+      </label>
+      <p id="lockMsg" class="error" role="alert" hidden></p>
+      <button class="btn primary block" type="submit">열기</button>
+    </form>
+  </section>
+
+  <!-- 앱 -->
+  <div id="shell" hidden>
+    <header class="topbar no-print">
+      <a class="brand" href="#/">발주서 도우미</a>
+      <nav class="nav">
+        <a href="#/" data-nav="list">발주 목록</a>
+        <a href="#/vendors" data-nav="vendors">거래처</a>
+        <a href="#/settings" data-nav="settings">설정</a>
+      </nav>
+    </header>
+    <div id="demoBar" class="demo-bar no-print" hidden>체험 모드예요. 입력한 내용은 이 브라우저에만 저장돼요.</div>
+    <main id="app" class="wrap"></main>
+  </div>
+
+  <div id="toast" class="toast no-print" role="status" hidden></div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
