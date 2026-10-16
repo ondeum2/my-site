@@ -301,3 +301,12 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
   .doc::before, .doc .lines tbody tr:nth-child(even) td, .doc .kv th, .doc .memo-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .doc tr, .doc .section-title, .party { break-inside: avoid; }
 }
+
+/* 주문서: 업체 취급 품목 버튼 */
+.picks { padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.picks-title { margin: 0 0 8px; font-size: .875rem; font-weight: 600; color: var(--ink-2); }
+.picks-title em { font-style: normal; font-weight: 400; color: var(--gold); margin-left: 6px; }
+.picks-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 180px; overflow-y: auto; }
+.pick { min-height: 36px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 999px; background: #fff; font: inherit; font-size: .875rem; cursor: pointer; color: var(--text); }
+.pick:hover { border-color: var(--gold); background: var(--gold-weak); }
+.pick small { color: var(--muted); }

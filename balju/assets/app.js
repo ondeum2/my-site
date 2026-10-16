@@ -348,6 +348,7 @@
             <input data-e="qty" placeholder="수량" aria-label="수량" autocomplete="off">
             <button type="button" class="btn" id="addItem">추가</button>
           </div>
+          <div id="picks" class="picks" hidden></div>
           <datalist id="dlName"></datalist>
           <datalist id="dlSpec"></datalist>
           <p class="muted small hint">한 줄 쓰고 <kbd>Enter</kbd>를 누르면 아래에 쌓여요. 품목은 그대로 남으니 규격·수량만 바꿔 다시 <kbd>Enter</kbd>.</p>
@@ -403,6 +404,20 @@
       const specs = cat.filter((c) => !n || c.name === n).map((c) => c.spec);
       fillOptions($('#dlSpec'), uniq(specs));
     };
+    // 고른 업체의 취급 품목을 버튼으로 보여 준다 (누르면 품목·규격이 채워짐)
+    const drawPicks = () => {
+      const v = curVendor();
+      const box = $('#picks');
+      if (!v) { box.hidden = true; return; }
+      const n = entry('name').value.trim().toLowerCase();
+      const cat = v.catalog || [];
+      const shown = cat.filter((c) => !n || c.name.toLowerCase().includes(n));
+      box.hidden = false;
+      box.innerHTML = cat.length
+        ? `<p class="picks-title">${esc(v.name)} 취급 품목 <em>눌러서 담기</em></p>
+           <div class="picks-list">${(shown.length ? shown : cat).map((c) => `<button type="button" class="pick" data-name="${esc(c.name)}" data-spec="${esc(c.spec)}">${esc(c.name)}${c.spec ? ` <small>${esc(c.spec)}</small>` : ''}</button>`).join('')}</div>`
+        : `<p class="picks-title">${esc(v.name)}에 등록된 품목이 없어요. <a href="#/vendors">거래처</a>에서 고치기 → 취급 품목을 등록하면 여기에 보여요.</p>`;
+    };
     const syncVendor = () => {
       $('#newVendor').hidden = f.vendor_sel.value !== 'new';
       const v = curVendor();
@@ -411,9 +426,18 @@
       note.hidden = !note.innerHTML;
       refreshNames();
       refreshSpecs();
+      drawPicks();
     };
     f.vendor_sel.addEventListener('change', syncVendor);
-    entry('name').addEventListener('input', refreshSpecs);
+    entry('name').addEventListener('input', () => { refreshSpecs(); drawPicks(); });
+    $('#picks').addEventListener('click', (e) => {
+      const b = e.target.closest('.pick');
+      if (!b) return;
+      entry('name').value = b.dataset.name;
+      entry('spec').value = b.dataset.spec;
+      refreshSpecs();
+      entry('qty').focus();
+    });
 
     // --- 주문 품목 쌓기 ---
     const drawItems = () => {
@@ -936,6 +960,18 @@
       lock();
     });
   }
+
+  // ---------- 새 버전 확인 ----------
+  // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
+  const VERSION = '3';
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
+    try {
+      const html = await (await fetch('/balju/?_=' + Date.now(), { cache: 'no-store' })).text();
+      const m = html.match(/app\.js\?v=(\w+)/);
+      if (m && m[1] !== VERSION) location.reload();
+    } catch { /* 오프라인 등 */ }
+  });
 
   // ---------- 시작 ----------
   if (DEMO || session.get()) unlock();
