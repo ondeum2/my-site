@@ -211,6 +211,9 @@
     return items.length > 1 ? `${first} 외 ${items.length - 1}건` : first;
   }
 
+  // 어느 농장으로 보냈는지 작게 표시
+  const farmTag = (o) => (o.farm_name ? `<span class="farm-tag">→ ${esc(o.farm_name)}</span>` : '');
+
   function statusBtn(o) {
     const done = o.status === STATUSES[1];
     return `<button class="status ${done ? 'done' : 'pending'}" data-status="${o.id}" title="눌러서 상태 바꾸기">${esc(o.status)}</button>`;
@@ -291,10 +294,9 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
             <div class="item-top">
               <span>${fmtDate(o.order_date)}</span>
               <span class="badge ${o.kind === 'A/S' ? 'as' : ''}">${esc(o.kind)}</span>
-              ${o.farm_name ? `<span>${esc(o.farm_name)}</span>` : ''}
               <span>No. ${o.id}</span>
             </div>
-            <div class="item-title">${esc(o.vendor_name)}</div>
+            <div class="item-title">${esc(o.vendor_name)}${farmTag(o)}</div>
             <div class="item-sub">${esc(summary(o))}</div>
           </a>
           <div class="item-actions">
@@ -721,7 +723,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
       <div class="page-head">
         <div>
           <a href="#/" class="small back">← 발주 목록</a>
-          <h1>${esc(o.vendor_name)} <span class="muted small">${esc(KIND_LABEL[o.kind] || o.kind)}</span></h1>
+          <h1>${esc(o.vendor_name)}${farmTag(o)} <span class="muted small">${esc(KIND_LABEL[o.kind] || o.kind)}</span></h1>
         </div>
         <div class="row">
           ${statusBtn(o)}
@@ -1040,7 +1042,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '7';
+  const VERSION = '8';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {
