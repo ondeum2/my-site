@@ -87,8 +87,9 @@ const one = (rows) => {
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-  const pass = process.env.ADMIN_PASSWORD;
-  if (!pass) return res.status(500).json({ error: 'Vercel 환경변수에 ADMIN_PASSWORD를 넣고 Redeploy 해 주세요.' });
+  // 발주서 전용 비밀번호가 있으면 그것을, 없으면 기존 관리자 비밀번호를 쓴다
+  const pass = process.env.BALJU_PASSWORD || process.env.ADMIN_PASSWORD;
+  if (!pass) return res.status(500).json({ error: 'Vercel 환경변수에 BALJU_PASSWORD를 넣고 Redeploy 해 주세요.' });
   if (!same(req.headers['x-admin-password'] || '', pass)) return res.status(401).json({ error: '비밀번호가 맞지 않아요.' });
 
   const type = String((req.query && req.query.type) || '');

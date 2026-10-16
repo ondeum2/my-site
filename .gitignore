@@ -2,3 +2,6 @@
 .vercel
 node_modules
 .claude
+
+.vercel
+.env*
