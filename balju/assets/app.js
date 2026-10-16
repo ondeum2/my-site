@@ -1,5 +1,5 @@
 // 발주서 도우미 — 화면 동작
-// 저장·조회는 전부 /api/data 가 한다. 이 파일에는 키나 비밀번호 값이 없다.
+// 저장·조회는 전부 /api/balju 가 한다. 이 파일에는 키나 비밀번호 값이 없다.
 (() => {
   'use strict';
 
@@ -33,7 +33,7 @@
     if (DEMO) return demoApi(method, type, id, body);
     const q = new URLSearchParams({ type });
     if (id) q.set('id', id);
-    const r = await fetch('/api/data?' + q, {
+    const r = await fetch('/api/balju?' + q, {
       method,
       headers: { 'Content-Type': 'application/json', 'x-admin-password': pw ?? session.get() },
       body: body ? JSON.stringify(body) : undefined,
