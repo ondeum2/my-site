@@ -132,6 +132,11 @@ module.exports = async (req, res) => {
         patch.updated_at = now();
         return res.status(200).json({ row: one(await sb(`po_orders?id=eq.${id}`, { method: 'PATCH', body: patch, prefer: rep })) });
       }
+      if (req.method === 'DELETE') {
+        needId();
+        await sb(`po_orders?id=eq.${id}`, { method: 'DELETE' });
+        return res.status(200).json({ ok: true });
+      }
     }
 
     if (type === 'vendors') {

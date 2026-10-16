@@ -75,7 +75,7 @@
       if (method === 'PATCH') { table[i] = { ...table[i], ...body, updated_at: now }; save(); return ok({ row: table[i] }); }
       if (method === 'DELETE') {
         table.splice(i, 1);
-        db.orders.forEach((o) => { if (o.vendor_id === Number(id)) o.vendor_id = null; });
+        if (type === 'vendors') db.orders.forEach((o) => { if (o.vendor_id === Number(id)) o.vendor_id = null; });
         save(); return ok({ ok: true });
       }
       return ok({});
@@ -208,6 +208,22 @@
     } catch (e) { fail(e); }
   }
 
+  async function deleteOrder(id) {
+    const o = findOrder(id);
+    if (!o) return false;
+    if (!confirm(`이 발주서를 지울까요?
+
+${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
+
+지우면 되돌릴 수 없어요.`)) return false;
+    try {
+      await api('DELETE', 'orders', { id: o.id });
+      state.orders = state.orders.filter((x) => x.id !== o.id);
+      toast('발주서를 지웠어요');
+      return true;
+    } catch (e) { fail(e); return false; }
+  }
+
   function viewList(app) {
     const f = state.filter;
     const pending = state.orders.filter((o) => o.status === STATUSES[0]).length;
@@ -261,11 +277,18 @@
             <div class="item-title">${esc(o.vendor_name)}</div>
             <div class="item-sub">${esc(summary(o))}</div>
           </a>
-          ${statusBtn(o)}
+          <div class="item-actions">
+            ${statusBtn(o)}
+            <button class="btn sm ghost danger" data-odel="${o.id}" title="이 발주서 지우기">지우기</button>
+          </div>
         </div>`).join('')
         : `<div class="empty">${state.orders.length ? '찾는 발주서가 없어요.' : '아직 만든 발주서가 없어요.<br>위의 버튼으로 첫 발주서를 만들어 보세요.'}</div>`;
     };
     drawList();
+    $('#list').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-odel]');
+      if (b && await deleteOrder(b.dataset.odel)) render();
+    });
 
     $('#q').addEventListener('input', (e) => { f.q = e.target.value; drawList(); });
     $$('.chips', app).forEach((g) => g.addEventListener('click', (e) => {
@@ -684,6 +707,7 @@
           ${statusBtn(o)}
           <a class="btn sm" href="#/edit/${o.id}">고치기</a>
           <a class="btn sm" href="#/new?from=${o.id}">같은 내용으로 새로</a>
+          <button class="btn sm danger" id="delOrder">지우기</button>
         </div>
       </div>
       ${v.prefer || v.prepaid ? `<p class="small print-hide view-note">${v.prefer ? `이 업체는 <b>${v.prefer === '문자' ? '카톡·문자' : '문서(인쇄·PDF)'}</b>로 받기를 원해요. ` : ''}${vendorMemo(v)}</p>` : ''}
@@ -715,6 +739,7 @@
     $$('.tabs button', app).forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
     setTab(tab);
     $('#printBtn').addEventListener('click', () => window.print());
+    $('#delOrder').addEventListener('click', async () => { if (await deleteOrder(o.id)) location.hash = '#/'; });
     $('#copyBtn').addEventListener('click', () => copyText($('#textOut').value, $('#textOut')));
   }
 
@@ -995,7 +1020,7 @@
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '5';
+  const VERSION = '6';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {
