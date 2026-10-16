@@ -733,36 +733,39 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
           <a href="#/" class="small back">← 발주 목록</a>
           <h1>${esc(o.vendor_name)}${farmTag(o)} <span class="muted small">${esc(KIND_LABEL[o.kind] || o.kind)}</span></h1>
         </div>
-        <div class="row">
+      </div>
+      ${v.prefer || v.prepaid ? `<p class="small print-hide view-note">${v.prefer ? `이 업체는 <b>${v.prefer === '문자' ? '카톡·문자' : '문서(인쇄·PDF)'}</b>로 받기를 원해요. ` : ''}${vendorMemo(v)}</p>` : ''}
+      <div class="viewbar print-hide">
+        <div class="tabs" role="tablist">
+          <button data-tab="doc" role="tab">문서형 (인쇄·PDF)</button>
+          <button data-tab="text" role="tab">문자형 (카톡·문자)</button>
+        </div>
+        <div class="row viewbar-actions">
           ${statusBtn(o)}
           <a class="btn sm" href="#/edit/${o.id}">고치기</a>
           <a class="btn sm" href="#/new?from=${o.id}">같은 내용으로 새로</a>
           <button class="btn sm danger" id="delOrder">지우기</button>
         </div>
       </div>
-      ${v.prefer || v.prepaid ? `<p class="small print-hide view-note">${v.prefer ? `이 업체는 <b>${v.prefer === '문자' ? '카톡·문자' : '문서(인쇄·PDF)'}</b>로 받기를 원해요. ` : ''}${vendorMemo(v)}</p>` : ''}
-      <div class="tabs" role="tablist">
-        <div class="tab-wrap">
-          <button data-tab="doc" role="tab">문서형 (인쇄·PDF)</button>
-          <button type="button" class="icon-act" id="printBtn" title="인쇄 · PDF 저장 (인쇄 창에서 'PDF로 저장'을 고르면 PDF가 돼요)" aria-label="인쇄 또는 PDF 저장">${ICON_PRINT}</button>
-        </div>
-        <div class="tab-wrap">
-          <button data-tab="text" role="tab">문자형 (카톡·문자)</button>
-          <button type="button" class="icon-act" id="copyBtn" title="글 복사" aria-label="문자형 글 복사">${ICON_COPY}</button>
-        </div>
-      </div>
       <div id="tabDoc">
-        <div class="paper-wrap">${docHtml(o)}</div>
+        <div class="paper-wrap">
+          <div class="paper">
+            <button type="button" class="corner-btn print-hide" id="printBtn" title="인쇄 · PDF 저장 (인쇄 창에서 'PDF로 저장'을 고르면 PDF가 돼요)" aria-label="인쇄 또는 PDF 저장">${ICON_PRINT}</button>
+            ${docHtml(o)}
+          </div>
+        </div>
       </div>
       <div id="tabText">
-        <textarea class="text-out" id="textOut" readonly>${esc(textOut(o))}</textarea>
+        <div class="text-box">
+          <button type="button" class="corner-btn" id="copyBtn" title="글 복사" aria-label="문자형 글 복사">${ICON_COPY}</button>
+          <textarea class="text-out" id="textOut" readonly>${esc(textOut(o))}</textarea>
+        </div>
       </div>`;
 
     const setTab = (t) => {
       tab = t;
       $$('.tabs [data-tab]', app).forEach((b) => {
         b.classList.toggle('on', b.dataset.tab === t);
-        b.closest('.tab-wrap').classList.toggle('on', b.dataset.tab === t);
         b.setAttribute('aria-selected', b.dataset.tab === t);
       });
       $('#tabDoc').hidden = t !== 'doc';
@@ -1062,7 +1065,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '10';
+  const VERSION = '11';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {

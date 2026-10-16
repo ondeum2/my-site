@@ -335,21 +335,31 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 /* 발주서 옆 농장명 */
 .farm-tag { margin-left: 8px; font-family: "Pretendard", sans-serif; font-size: .8rem; font-weight: 600; color: var(--gold); white-space: nowrap; vertical-align: middle; }
 
-/* 탭 옆 아이콘 (인쇄·복사): 글자와 한 덩어리로 보이게 */
-.tabs { gap: 6px; }
-.tab-wrap { display: inline-flex; align-items: center; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.tab-wrap.on { border-bottom-color: var(--gold); }
-.tabs .tab-wrap button[data-tab] { border-bottom: 0; padding: 0 4px 0 14px; }
-.icon-act {
-  display: inline-grid; place-items: center; width: 30px; height: 30px; padding: 0; margin-right: 6px;
-  border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer;
-  transition: color .15s, background .15s;
+
+/* 발주서 화면: 탭과 버튼을 한 줄에 */
+.viewbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; border-bottom: 1px solid var(--line); margin: 14px 0 18px; }
+.viewbar .tabs { border-bottom: 0; margin: 0; }
+.viewbar-actions { padding-bottom: 6px; }
+
+/* 문서·글 상자 오른쪽 위 모서리 아이콘 (인쇄·복사) */
+.paper { position: relative; max-width: 780px; margin: 0 auto; }
+.text-box { position: relative; }
+.text-box .text-out { padding-right: 60px; }
+.corner-btn {
+  position: absolute; top: 18px; right: 18px; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; margin: 0;
+  border: 1px solid var(--line-strong); border-radius: 8px; background: #fff; color: var(--muted);
+  cursor: pointer; box-shadow: 0 2px 6px -2px rgba(22,33,58,.15);
+  transition: color .15s, border-color .15s, background .15s;
 }
-.tab-wrap.on .icon-act { color: var(--ink); }
-.icon-act:hover { color: var(--gold); background: var(--gold-weak); }
-.icon-act.ok { color: var(--done); background: var(--done-weak); }
-.icon-act svg { display: block; }
+.text-box .corner-btn { top: 10px; right: 22px; }
+.corner-btn svg { display: block; flex: none; }
+.corner-btn:hover { color: var(--ink); border-color: var(--gold); background: var(--gold-weak); }
+.corner-btn.ok { color: var(--done); border-color: var(--done); background: var(--done-weak); }
 @media (max-width: 640px) {
-  .tabs .tab-wrap button[data-tab] { padding: 0 2px 0 8px; font-size: .9rem; }
-  .icon-act { margin-right: 2px; }
+  .viewbar { align-items: stretch; }
+  .viewbar-actions { padding-bottom: 10px; }
+  .tabs button[data-tab] { padding: 0 10px; font-size: .9rem; }
+  .corner-btn { top: 12px; right: 12px; }
 }
