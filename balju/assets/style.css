@@ -334,3 +334,18 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 
 /* 발주서 옆 농장명 */
 .farm-tag { margin-left: 8px; font-family: "Pretendard", sans-serif; font-size: .8rem; font-weight: 600; color: var(--gold); white-space: nowrap; vertical-align: middle; }
+
+/* 탭 옆 아이콘 (인쇄·복사) */
+.tab-wrap { display: flex; align-items: center; gap: 2px; }
+.tabs .tab-wrap + .tab-wrap { margin-left: 8px; }
+.icon-act {
+  display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0;
+  border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--muted); cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.icon-act:hover { color: var(--ink); border-color: var(--gold); background: var(--gold-weak); }
+.icon-act.ok { color: var(--done); border-color: var(--done); background: var(--done-weak); }
+@media (max-width: 640px) {
+  .tabs button[data-tab] { padding: 0 8px; font-size: .9rem; }
+  .tabs .tab-wrap + .tab-wrap { margin-left: 2px; }
+}

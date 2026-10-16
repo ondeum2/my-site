@@ -625,6 +625,10 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
   }
 
   // ---------- 미리보기 (문서형 / 문자형) ----------
+  const svg = (d) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICON_COPY = svg('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>');
+  const ICON_PRINT = svg('<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/>');
+  const ICON_CHECK = svg('<path d="M5 12.5l4.5 4.5L19 7"/>');
   function docHtml(o) {
     const v = findVendor(o.vendor_id) || {};
     const isAS = o.kind === 'A/S';
@@ -704,14 +708,18 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
     return out.join('\n');
   }
 
+  let setTabText = () => {};
   async function copyText(text, ta) {
     try {
       await navigator.clipboard.writeText(text);
       toast('복사했어요. 카톡·문자에 붙여넣으세요');
+      return true;
     } catch {
+      setTabText();
       ta.focus();
       ta.select();
-      toast('글이 선택됐어요. 길게 눌러 복사해 주세요');
+      toast('글이 선택됐어요. Ctrl+C(휴대폰은 길게 눌러 복사)로 복사해 주세요');
+      return false;
     }
   }
 
@@ -734,19 +742,20 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
       </div>
       ${v.prefer || v.prepaid ? `<p class="small print-hide view-note">${v.prefer ? `이 업체는 <b>${v.prefer === '문자' ? '카톡·문자' : '문서(인쇄·PDF)'}</b>로 받기를 원해요. ` : ''}${vendorMemo(v)}</p>` : ''}
       <div class="tabs" role="tablist">
-        <button data-tab="doc" role="tab">문서형 (인쇄·PDF)</button>
-        <button data-tab="text" role="tab">문자형 (카톡·문자)</button>
+        <div class="tab-wrap">
+          <button data-tab="doc" role="tab">문서형 (인쇄·PDF)</button>
+          <button type="button" class="icon-act" id="printBtn" title="인쇄 · PDF 저장 (인쇄 창에서 'PDF로 저장'을 고르면 PDF가 돼요)" aria-label="인쇄 또는 PDF 저장">${ICON_PRINT}</button>
+        </div>
+        <div class="tab-wrap">
+          <button data-tab="text" role="tab">문자형 (카톡·문자)</button>
+          <button type="button" class="icon-act" id="copyBtn" title="글 복사" aria-label="문자형 글 복사">${ICON_COPY}</button>
+        </div>
       </div>
       <div id="tabDoc">
-        <div class="row end print-hide" style="margin-bottom:14px">
-          <span class="muted small spacer">PDF로 저장하려면 인쇄 창에서 'PDF로 저장'을 고르세요.</span>
-          <button class="btn primary" id="printBtn">인쇄 · PDF 저장</button>
-        </div>
         <div class="paper-wrap">${docHtml(o)}</div>
       </div>
-      <div id="tabText" class="stack">
+      <div id="tabText">
         <textarea class="text-out" id="textOut" readonly>${esc(textOut(o))}</textarea>
-        <div class="row end"><button class="btn primary" id="copyBtn">글 복사하기</button></div>
       </div>`;
 
     const setTab = (t) => {
@@ -760,9 +769,18 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
     };
     $$('.tabs button', app).forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
     setTab(tab);
-    $('#printBtn').addEventListener('click', () => window.print());
+    setTabText = () => setTab('text');
+    // 인쇄는 문서형이 보여야 되므로 먼저 문서형으로 바꾼다
+    $('#printBtn').addEventListener('click', () => { setTab('doc'); setTimeout(() => window.print(), 50); });
     $('#delOrder').addEventListener('click', async () => { if (await deleteOrder(o.id)) location.hash = '#/'; });
-    $('#copyBtn').addEventListener('click', () => copyText($('#textOut').value, $('#textOut')));
+    $('#copyBtn').addEventListener('click', async () => {
+      const b = $('#copyBtn');
+      if (await copyText($('#textOut').value, $('#textOut'))) {
+        b.innerHTML = ICON_CHECK;
+        b.classList.add('ok');
+        setTimeout(() => { b.innerHTML = ICON_COPY; b.classList.remove('ok'); }, 1500);
+      }
+    });
   }
 
   // ---------- 거래처 ----------
@@ -1042,7 +1060,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '8';
+  const VERSION = '9';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {
