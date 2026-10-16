@@ -7,90 +7,129 @@
 <title>비품 요청함</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Reenie+Beanie&family=Gowun+Dodum&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <a class="brand" href="/">비품 요청함<span>.</span></a>
-    <nav class="nav">
-      <a href="#request">요청하기</a>
-      <a href="/board.html">현황판</a>
-    </nav>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a class="logo" href="/"><i></i>비품 요청함</a>
+  <div class="links">
+    <a href="#how" class="hide-sm">진행 순서</a>
+    <a href="/board.html">현황판</a>
+    <a href="#request" class="pill-dark">요청하기</a>
   </div>
-</header>
+</nav>
 
 <main>
   <section class="hero">
+    <div class="blob a" aria-hidden="true"></div>
+    <div class="blob b" aria-hidden="true"></div>
     <div class="wrap">
-      <p class="eyebrow">사내 비품 · 장비 요청</p>
-      <h1>필요한 비품, 여기 한 곳에서 요청하세요.</h1>
-      <p class="lead">소모품부터 장비 A/S까지 이곳에서 요청하세요. 접수됐는지, 도착했는지는 현황판에서 바로 확인할 수 있어요.</p>
-      <div class="actions">
-        <a class="btn light" href="#request">요청하기</a>
-        <a class="btn outline-light" href="/board.html">현황판 보기</a>
+      <span class="badge reveal">사내 비품 · 장비 요청</span>
+      <h1 class="reveal">필요한 비품, 여기 <span class="hand">한 곳</span>에서 요청하세요.</h1>
+      <p class="reveal">소모품부터 장비 A/S까지 이곳에서 요청하세요. 접수됐는지, 도착했는지는 현황판에서 바로 확인할 수 있어요.</p>
+      <div class="actions reveal">
+        <a class="btn coral" href="#request">요청하기</a>
+        <a class="btn white" href="/board.html">현황판 보기</a>
       </div>
     </div>
   </section>
 
   <section class="block">
     <div class="wrap">
-      <div class="section-head">
-        <div class="no">01</div>
+      <div class="head reveal">
+        <span class="hand">무엇을 요청하나요</span>
+        <h2>이런 것들을 요청할 수 있어요</h2>
+        <p>옆으로 넘겨 보세요. 종류마다 적을 내용이 조금씩 달라요.</p>
+      </div>
+      <div class="scroller reveal">
+        <div class="scard"><span class="t">소모품</span><span class="b">볼펜, 복사용지, 토너 — 품목과 수량만</span></div>
+        <div class="scard"><span class="t">비품</span><span class="b">의자, 책상, 수납장 — 모델명과 예상 금액</span></div>
+        <div class="scard"><span class="t">장비 구입</span><span class="b">노트북, 모니터, 프린터 — 모델명과 예상 금액</span></div>
+        <div class="scard"><span class="t">A/S</span><span class="b">고장 난 장비 — 어떤 증상인지 적어 주세요</span></div>
+        <div class="scard"><span class="t">20만 원 이상</span><span class="b">대표 승인을 거친 뒤 진행돼요</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="hand">휴대폰에서도</span>
+        <h2>요청하고, 기다리고, 받아요</h2>
+        <p>폰으로 요청을 보내고 현황판에서 진행 상황을 확인해요.</p>
+      </div>
+      <div class="phones reveal" aria-hidden="true">
+        <div class="inner">
+          <div class="phone side left"><div class="screen">
+            <h4>요청 현황판</h4>
+            <p class="sub">우리 부서 요청</p>
+            <div class="row"><span>A4 복사용지 × 2<br><small>영업팀 · 김*수</small></span><span class="tick">접수 ✔</span></div>
+            <div class="row"><span>모니터 × 1<br><small>영업팀 · 이*</small></span><span class="wait">대기</span></div>
+            <div class="row"><span>토너<br><small>영업팀 · 박*진</small></span><span class="tick">도착 ✔</span></div>
+          </div></div>
+          <div class="phone center"><div class="screen">
+            <h4>요청하기</h4>
+            <p class="sub">무엇이 필요하세요?</p>
+            <div class="chipset"><span class="on">소모품</span><span>비품</span><span>장비 구입</span><span>A/S</span></div>
+            <div class="mock-field">품목명</div>
+            <div class="mock-field">수량</div>
+            <div class="pulse">요청</div>
+          </div></div>
+          <div class="phone side right"><div class="screen">
+            <h4>도착했어요</h4>
+            <p class="sub">현황판에 체크돼요</p>
+            <div class="big-tick"><b>✔</b>접수 → 도착</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="hand">진행 순서</span>
         <h2>이렇게 진행돼요</h2>
         <p>진행 상황은 현황판에 체크 표시로 나타나요.</p>
       </div>
-      <ol class="steps">
-        <li><div class="n">1</div><h3>요청</h3><p>아래 양식에 품목과 수량을 적어 보내요.</p></li>
-        <li><div class="n">2</div><h3>접수</h3><p>담당자가 확인하면 현황판에 ‘접수’가 체크돼요.</p></li>
-        <li><div class="n">3</div><h3>대표 승인 <span class="tag">20만 원 이상</span></h3><p>예상 금액이 20만 원 이상이면 대표 승인을 거쳐요.</p></li>
-        <li><div class="n">4</div><h3>도착</h3><p>물품이 도착하거나 A/S가 끝나면 ‘도착’이 체크돼요.</p></li>
-      </ol>
+      <div class="notes">
+        <article class="note reveal"><span class="num">01</span><h3>요청</h3><p>아래 양식에 품목과 수량을 적어 보내요.</p><div class="sign"><span>보내기</span></div></article>
+        <article class="note reveal"><span class="num">02</span><h3>접수</h3><p>담당자가 확인하면 현황판에 ‘접수’가 체크돼요.</p><div class="sign"><span>확인했어요</span></div></article>
+        <article class="note reveal"><span class="num">03</span><h3>대표 승인 <span class="chip-coral">20만 원 이상</span></h3><p>예상 금액이 20만 원 이상이면 대표 승인을 거쳐요.</p><div class="sign"><span>승인</span></div></article>
+        <article class="note reveal"><span class="num">04</span><h3>도착</h3><p>물품이 도착하거나 A/S가 끝나면 ‘도착’이 체크돼요.</p><div class="sign"><span>받았어요</span></div></article>
+      </div>
     </div>
   </section>
 
   <section class="block">
     <div class="wrap">
-      <div class="section-head">
-        <div class="no">02</div>
-        <h2>무엇을 적으면 되나요</h2>
-        <p>요청 종류마다 이것만 적어 주시면 돼요.</p>
+      <div class="head reveal">
+        <span class="hand">궁금한 것</span>
+        <h2>자주 묻는 질문</h2>
       </div>
-      <div class="kinds">
-        <article>
-          <h3>소모품</h3>
-          <p class="eg">볼펜, 복사용지, 토너 등</p>
-          <ul><li>품목명</li><li>수량</li></ul>
-        </article>
-        <article>
-          <h3>비품</h3>
-          <p class="eg">의자, 책상, 수납장 등</p>
-          <ul><li>품목명 (가능하면 모델명)</li><li>수량 · 예상 금액</li></ul>
-        </article>
-        <article>
-          <h3>장비 구입</h3>
-          <p class="eg">노트북, 모니터, 프린터 등</p>
-          <ul><li>품목명 · 모델명</li><li>수량 · 예상 금액</li></ul>
-        </article>
-        <article>
-          <h3>A/S</h3>
-          <p class="eg">고장 난 장비 수리</p>
-          <ul><li>고장 난 장비 이름</li><li>고장 증상</li></ul>
-        </article>
+      <div class="faq reveal">
+        <div class="qa"><button type="button" aria-expanded="false">누가 승인하나요?<span class="plus">+</span></button><div class="body"><div><p>예상 금액이 20만 원 이상이면 대표 승인을 거쳐요. 20만 원 미만은 담당자가 확인해서 진행해요.</p></div></div></div>
+        <div class="qa"><button type="button" aria-expanded="false">처리하는 데 얼마나 걸리나요?<span class="plus">+</span></button><div class="body"><div><p>처리 기간 안내는 준비 중이에요. 정해지면 여기에 적어 둘게요.</p></div></div></div>
+        <div class="qa"><button type="button" aria-expanded="false">내 요청은 어디서 확인하나요?<span class="plus">+</span></button><div class="body"><div><p>현황판에서 부서를 고르면 우리 부서 요청이 보여요. 이름은 가운데 글자를 가려서 보여 줘요.</p></div></div></div>
+        <div class="qa"><button type="button" aria-expanded="false">A/S는 어떻게 신청하나요?<span class="plus">+</span></button><div class="body"><div><p>요청 종류에서 ‘A/S’를 고르고, 고장 난 장비 이름과 증상을 적어 주세요.</p></div></div></div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="request">
+  <section class="convert" id="request">
+    <div class="blob a" aria-hidden="true"></div>
+    <div class="blob b" aria-hidden="true"></div>
     <div class="wrap">
-      <div class="section-head">
-        <div class="no">03</div>
+      <div class="head reveal">
+        <div class="mark" aria-hidden="true"></div>
         <h2>요청하기</h2>
         <p>보내고 나면 현황판에서 진행 상황을 볼 수 있어요.</p>
       </div>
 
-      <div class="form-box">
+      <div class="form-box reveal">
         <form id="form" novalidate>
           <div class="grid2">
             <div class="field"><label for="name">이름</label><input type="text" id="name" maxlength="50" autocomplete="name" required></div>
@@ -142,16 +181,16 @@
             <span><b>개인정보 수집·이용 동의 (필수)</b><br>요청 처리를 위해 이름·부서·연락처를 받아요. 요청 처리 외의 용도로는 쓰지 않아요.</span>
           </label>
 
-          <button class="btn" type="submit" id="submit">요청 보내기</button>
+          <button class="btn dark" type="submit" id="submit">요청 보내기</button>
           <p class="msg err" id="err" role="alert" hidden></p>
         </form>
 
         <div class="done" id="done" hidden>
           <h3>요청이 접수됐어요.</h3>
           <p>담당자가 확인하면 현황판에 ‘접수’가 체크돼요.</p>
-          <div class="actions" style="justify-content:center">
-            <a class="btn" href="/board.html">현황판에서 확인하기</a>
-            <button class="btn ghost" type="button" id="again">하나 더 요청하기</button>
+          <div class="actions">
+            <a class="btn coral" href="/board.html">현황판에서 확인하기</a>
+            <button class="btn white" type="button" id="again">하나 더 요청하기</button>
           </div>
         </div>
       </div>
@@ -161,7 +200,7 @@
 
 <footer>
   <div class="wrap">
-    <span>비품 요청함</span>
+    <span class="hand">비품 요청함</span>
     <span>처리 기간과 담당자 안내는 준비 중이에요.</span>
   </div>
 </footer>
@@ -169,6 +208,18 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const form = $('form');
+
+// 스크롤하면 천천히 나타나기
+const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold: 0.12 }) : null;
+document.querySelectorAll('.reveal').forEach((el) => io ? io.observe(el) : el.classList.add('in'));
+
+// 자주 묻는 질문 열고 닫기
+document.querySelectorAll('.qa button').forEach((b) => b.addEventListener('click', () => {
+  const open = b.parentElement.classList.toggle('open');
+  b.setAttribute('aria-expanded', open);
+}));
 
 function kind() { return form.querySelector('input[name=kind]:checked').value; }
 
