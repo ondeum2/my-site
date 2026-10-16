@@ -42,7 +42,12 @@ function cleanVendor(b) {
     contact_person: clip(b.contact_person, 40),
     phone: clip(b.phone, 40),
     prefer: PREFERS.includes(b.prefer) ? b.prefer : '',
+    prepaid: b.prepaid === true,
     memo: clip(b.memo, 300),
+    // 업체 카탈로그: 이 업체가 가진 품목·규격
+    catalog: (Array.isArray(b.catalog) ? b.catalog : []).slice(0, 500)
+      .map((i) => ({ name: clip(i && i.name, 100), spec: clip(i && i.spec, 100) }))
+      .filter((i) => i.name),
   };
   if (!row.name) throw bad('업체 이름을 적어 주세요.');
   return row;
@@ -57,6 +62,7 @@ function cleanOrder(b) {
     order_date: b.order_date,
     vendor_id: Number.isInteger(vid) && vid > 0 ? vid : null,
     vendor_name: clip(b.vendor_name, 60),
+    farm_name: clip(b.farm_name, 60),
     manager: clip(b.manager, 40),
     phone: clip(b.phone, 40),
     address: clip(b.address, 200),
@@ -145,14 +151,11 @@ module.exports = async (req, res) => {
     }
 
     if (type === 'settings' && req.method === 'PUT') {
-      const row = {
-        id: 1,
-        company: clip(b.company, 60),
-        manager: clip(b.manager, 40),
-        phone: clip(b.phone, 40),
-        address: clip(b.address, 200),
-        updated_at: now(),
-      };
+      // 우리 회사(농장) 정보는 최대 5곳
+      const farms = (Array.isArray(b.farms) ? b.farms : []).slice(0, 5)
+        .map((x) => ({ name: clip(x && x.name, 60), manager: clip(x && x.manager, 40), phone: clip(x && x.phone, 40), address: clip(x && x.address, 200) }))
+        .filter((x) => x.name);
+      const row = { id: 1, farms, updated_at: now() };
       const saved = await sb('po_settings?on_conflict=id', { method: 'POST', body: row, prefer: `resolution=merge-duplicates,${rep}` });
       return res.status(200).json({ row: one(saved) });
     }

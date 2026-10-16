@@ -44,3 +44,10 @@ alter table public.po_orders enable row level security;
 alter table public.po_settings enable row level security;
 revoke all on public.po_vendors, public.po_orders, public.po_settings from anon, authenticated;
 -- 정책은 만들지 않는다: 브라우저(공개 키)로는 접근 불가, 서버(/api)만 접근
+
+-- 2026-10-17 추가: 거래처 품목 카탈로그·선입업체, 농장명, 우리 회사 정보 5곳
+alter table public.po_vendors add column if not exists catalog jsonb not null default '[]'::jsonb;
+alter table public.po_vendors add column if not exists prepaid boolean not null default false;
+alter table public.po_orders add column if not exists farm_name text;
+alter table public.po_settings add column if not exists farms jsonb not null default '[]'::jsonb;
+notify pgrst, 'reload schema';
