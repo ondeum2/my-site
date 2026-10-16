@@ -541,7 +541,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
       $$('.seg button', f).forEach((b) => b.classList.toggle('on', b.dataset.kind === k));
       $('#orderPart').hidden = k !== '주문';
       $('#asPart').hidden = k !== 'A/S';
-      $('#addrLabel').textContent = k === 'A/S' ? '방문 주소' : '배송지';
+      $('#addrLabel').textContent = '배송지';
     };
     $$('.seg button', f).forEach((b) => b.addEventListener('click', () => setKind(b.dataset.kind)));
 
@@ -625,7 +625,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
   }
 
   // ---------- 미리보기 (문서형 / 문자형) ----------
-  const svg = (d) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const svg = (d) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   const ICON_COPY = svg('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>');
   const ICON_PRINT = svg('<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/>');
   const ICON_CHECK = svg('<path d="M5 12.5l4.5 4.5L19 7"/>');
@@ -670,7 +670,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
           <thead><tr><th style="width:52px">No</th><th>품목</th><th>규격</th><th style="width:100px">수량</th></tr></thead>
           <tbody>${lines}</tbody>
         </table>`}
-      <div class="section-title">${isAS ? '방문지' : '배송지'}</div>
+      <div class="section-title">배송지</div>
       <table class="kv">
         <tr><th>주소</th><td>${esc(o.address)}</td></tr>
         <tr><th>농장명</th><td>${esc(o.farm_name || '')}</td></tr>
@@ -698,7 +698,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
     }
     out.push(
       '',
-      `■ ${isAS ? '방문지' : '배송지'}`,
+      '■ 배송지',
       `주소: ${o.address || ''}`,
       `농장명: ${o.farm_name || ''}`,
       `담당자: ${o.manager || ''}`,
@@ -760,14 +760,15 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
     const setTab = (t) => {
       tab = t;
-      $$('.tabs button', app).forEach((b) => {
+      $$('.tabs [data-tab]', app).forEach((b) => {
         b.classList.toggle('on', b.dataset.tab === t);
+        b.closest('.tab-wrap').classList.toggle('on', b.dataset.tab === t);
         b.setAttribute('aria-selected', b.dataset.tab === t);
       });
       $('#tabDoc').hidden = t !== 'doc';
       $('#tabText').hidden = t !== 'text';
     };
-    $$('.tabs button', app).forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+    $$('.tabs [data-tab]', app).forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
     setTab(tab);
     setTabText = () => setTab('text');
     // 인쇄는 문서형이 보여야 되므로 먼저 문서형으로 바꾼다
@@ -775,6 +776,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
     $('#delOrder').addEventListener('click', async () => { if (await deleteOrder(o.id)) location.hash = '#/'; });
     $('#copyBtn').addEventListener('click', async () => {
       const b = $('#copyBtn');
+      setTab('text');
       if (await copyText($('#textOut').value, $('#textOut'))) {
         b.innerHTML = ICON_CHECK;
         b.classList.add('ok');
@@ -1060,7 +1062,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '9';
+  const VERSION = '10';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {

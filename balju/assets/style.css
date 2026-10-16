@@ -335,17 +335,21 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 /* 발주서 옆 농장명 */
 .farm-tag { margin-left: 8px; font-family: "Pretendard", sans-serif; font-size: .8rem; font-weight: 600; color: var(--gold); white-space: nowrap; vertical-align: middle; }
 
-/* 탭 옆 아이콘 (인쇄·복사) */
-.tab-wrap { display: flex; align-items: center; gap: 2px; }
-.tabs .tab-wrap + .tab-wrap { margin-left: 8px; }
+/* 탭 옆 아이콘 (인쇄·복사): 글자와 한 덩어리로 보이게 */
+.tabs { gap: 6px; }
+.tab-wrap { display: inline-flex; align-items: center; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab-wrap.on { border-bottom-color: var(--gold); }
+.tabs .tab-wrap button[data-tab] { border-bottom: 0; padding: 0 4px 0 14px; }
 .icon-act {
-  display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0;
-  border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--muted); cursor: pointer;
-  transition: color .15s, border-color .15s, background .15s;
+  display: inline-grid; place-items: center; width: 30px; height: 30px; padding: 0; margin-right: 6px;
+  border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer;
+  transition: color .15s, background .15s;
 }
-.icon-act:hover { color: var(--ink); border-color: var(--gold); background: var(--gold-weak); }
-.icon-act.ok { color: var(--done); border-color: var(--done); background: var(--done-weak); }
+.tab-wrap.on .icon-act { color: var(--ink); }
+.icon-act:hover { color: var(--gold); background: var(--gold-weak); }
+.icon-act.ok { color: var(--done); background: var(--done-weak); }
+.icon-act svg { display: block; }
 @media (max-width: 640px) {
-  .tabs button[data-tab] { padding: 0 8px; font-size: .9rem; }
-  .tabs .tab-wrap + .tab-wrap { margin-left: 2px; }
+  .tabs .tab-wrap button[data-tab] { padding: 0 2px 0 8px; font-size: .9rem; }
+  .icon-act { margin-right: 2px; }
 }
