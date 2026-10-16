@@ -35,5 +35,12 @@ module.exports = async (req, res) => {
     if (!r.ok) return res.status(500).json({ error: '바꾸지 못했어요.' });
     return res.status(200).json({ ok: true });
   }
+  if (req.method === 'DELETE') {
+    const id = Number(readBody(req).id);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: '잘못된 요청이에요.' });
+    const r = await fetch(`${SB_URL}/rest/v1/requests?id=eq.${id}`, { method: 'DELETE', headers: { ...sbHeaders(), Prefer: 'return=minimal' } });
+    if (!r.ok) return res.status(500).json({ error: '삭제하지 못했어요.' });
+    return res.status(200).json({ ok: true });
+  }
   return res.status(405).json({ error: '지원하지 않는 요청이에요.' });
 };
