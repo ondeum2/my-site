@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>요청 현황판 · 비품 요청함</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/">비품 요청함<span>.</span></a>
+    <nav class="nav">
+      <a href="/#request">요청하기</a>
+      <a href="/board.html" aria-current="page">현황판</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="page-head">
+    <h1>요청 현황판</h1>
+    <p>부서를 고르면 우리 부서 요청만 보여요. 이름은 가운데 글자를 가려서 보여 줘요.</p>
+  </div>
+
+  <div class="toolbar">
+    <select id="dept" aria-label="부서 고르기"><option value="">전체 부서</option></select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="list"><div class="empty">불러오는 중…</div></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>비품 요청함</span>
+    <a href="/#request">새 요청하기 →</a>
+  </div>
+</footer>
+
+<script>
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const day = (iso) => { const d = new Date(iso); return `${d.getMonth() + 1}.${d.getDate()}`; };
+let rows = [];
+
+function render() {
+  const dept = document.getElementById('dept').value;
+  const shown = dept ? rows.filter((r) => r.dept === dept) : rows;
+  document.getElementById('count').textContent = `${shown.length}건`;
+  const list = document.getElementById('list');
+  if (!shown.length) { list.innerHTML = '<div class="empty">아직 요청이 없어요.</div>'; return; }
+  const pill = (on, label) => `<span class="pill ${on ? 'on' : 'off'}">${label} ${on ? '✔' : '대기'}</span>`;
+  list.innerHTML = `<table class="board">
+    <thead><tr><th>요청일</th><th>부서</th><th>이름</th><th>종류</th><th>품목</th><th>접수</th><th>도착</th></tr></thead>
+    <tbody>${shown.map((r) => `<tr>
+      <td data-k="요청일">${day(r.created_at)}</td>
+      <td data-k="부서">${esc(r.dept)}</td>
+      <td data-k="이름">${esc(r.name)}</td>
+      <td data-k="종류">${esc(r.kind)}${r.approval ? ' <span class="tag">대표 승인</span>' : ''}</td>
+      <td class="item">${esc(r.item)}${r.qty > 1 ? ` × ${r.qty}` : ''}</td>
+      <td class="status">${pill(r.received, '접수')}</td>
+      <td class="status">${pill(r.arrived, '도착')}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+async function load() {
+  try {
+    const r = await fetch('/api/board', { cache: 'no-store' });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || '불러오지 못했어요.');
+    rows = j.rows || [];
+    const sel = document.getElementById('dept');
+    [...new Set(rows.map((x) => x.dept))].sort().forEach((d) => {
+      const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o);
+    });
+    render();
+  } catch (e) {
+    document.getElementById('list').innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+document.getElementById('dept').addEventListener('change', render);
+load();
+</script>
+</body>
+</html>

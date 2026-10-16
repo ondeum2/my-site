@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>비품 요청함</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/">비품 요청함<span>.</span></a>
+    <nav class="nav">
+      <a href="#request">요청하기</a>
+      <a href="/board.html">현황판</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">사내 비품 · 장비 요청</p>
+      <h1>필요한 비품, 여기 한 곳에서 요청하세요.</h1>
+      <p class="lead">소모품부터 장비 A/S까지 이곳에서 요청하세요. 접수됐는지, 도착했는지는 현황판에서 바로 확인할 수 있어요.</p>
+      <div class="actions">
+        <a class="btn light" href="#request">요청하기</a>
+        <a class="btn outline-light" href="/board.html">현황판 보기</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="no">01</div>
+        <h2>이렇게 진행돼요</h2>
+        <p>진행 상황은 현황판에 체크 표시로 나타나요.</p>
+      </div>
+      <ol class="steps">
+        <li><div class="n">1</div><h3>요청</h3><p>아래 양식에 품목과 수량을 적어 보내요.</p></li>
+        <li><div class="n">2</div><h3>접수</h3><p>담당자가 확인하면 현황판에 ‘접수’가 체크돼요.</p></li>
+        <li><div class="n">3</div><h3>대표 승인 <span class="tag">20만 원 이상</span></h3><p>예상 금액이 20만 원 이상이면 대표 승인을 거쳐요.</p></li>
+        <li><div class="n">4</div><h3>도착</h3><p>물품이 도착하거나 A/S가 끝나면 ‘도착’이 체크돼요.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="no">02</div>
+        <h2>무엇을 적으면 되나요</h2>
+        <p>요청 종류마다 이것만 적어 주시면 돼요.</p>
+      </div>
+      <div class="kinds">
+        <article>
+          <h3>소모품</h3>
+          <p class="eg">볼펜, 복사용지, 토너 등</p>
+          <ul><li>품목명</li><li>수량</li></ul>
+        </article>
+        <article>
+          <h3>비품</h3>
+          <p class="eg">의자, 책상, 수납장 등</p>
+          <ul><li>품목명 (가능하면 모델명)</li><li>수량 · 예상 금액</li></ul>
+        </article>
+        <article>
+          <h3>장비 구입</h3>
+          <p class="eg">노트북, 모니터, 프린터 등</p>
+          <ul><li>품목명 · 모델명</li><li>수량 · 예상 금액</li></ul>
+        </article>
+        <article>
+          <h3>A/S</h3>
+          <p class="eg">고장 난 장비 수리</p>
+          <ul><li>고장 난 장비 이름</li><li>고장 증상</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="request">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="no">03</div>
+        <h2>요청하기</h2>
+        <p>보내고 나면 현황판에서 진행 상황을 볼 수 있어요.</p>
+      </div>
+
+      <div class="form-box">
+        <form id="form" novalidate>
+          <div class="grid2">
+            <div class="field"><label for="name">이름</label><input type="text" id="name" maxlength="50" autocomplete="name" required></div>
+            <div class="field"><label for="dept">부서</label><input type="text" id="dept" maxlength="50" placeholder="예: 영업팀" required></div>
+          </div>
+          <div class="field">
+            <label for="contact">연락처</label>
+            <input type="text" id="contact" maxlength="100" placeholder="사내 메신저 아이디 또는 내선 번호" required>
+          </div>
+
+          <div class="field">
+            <span class="label">요청 종류</span>
+            <div class="chips" role="radiogroup">
+              <label><input type="radio" name="kind" value="소모품" checked><span>소모품</span></label>
+              <label><input type="radio" name="kind" value="비품"><span>비품</span></label>
+              <label><input type="radio" name="kind" value="장비 구입"><span>장비 구입</span></label>
+              <label><input type="radio" name="kind" value="A/S"><span>A/S</span></label>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field"><label for="item" id="itemLabel">품목명</label><input type="text" id="item" maxlength="200" placeholder="예: A4 복사용지" required></div>
+            <div class="field"><label for="qty">수량</label><input type="number" id="qty" min="1" max="9999" value="1" inputmode="numeric"></div>
+          </div>
+
+          <div class="field">
+            <label for="price"><span id="priceLabel">예상 금액</span> <span class="opt">(대략, 원)</span></label>
+            <input type="number" id="price" min="0" step="1000" inputmode="numeric" placeholder="예: 150000">
+          </div>
+          <p class="notice" id="approvalNotice" hidden>20만 원 이상이라 <b>대표 승인</b>이 필요해요. 승인 후 진행돼요.</p>
+
+          <div class="field" id="symptomField" hidden>
+            <label for="symptom">고장 증상</label>
+            <textarea id="symptom" maxlength="1000" placeholder="예: 전원은 켜지는데 화면이 안 나와요"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="needBy">필요한 날짜 <span class="opt">(선택)</span></label>
+            <input type="date" id="needBy">
+          </div>
+
+          <div class="trap" aria-hidden="true">
+            <label for="website">비워 두세요</label>
+            <input type="text" id="website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" id="consent">
+            <span><b>개인정보 수집·이용 동의 (필수)</b><br>요청 처리를 위해 이름·부서·연락처를 받아요. 요청 처리 외의 용도로는 쓰지 않아요.</span>
+          </label>
+
+          <button class="btn" type="submit" id="submit">요청 보내기</button>
+          <p class="msg err" id="err" role="alert" hidden></p>
+        </form>
+
+        <div class="done" id="done" hidden>
+          <h3>요청이 접수됐어요.</h3>
+          <p>담당자가 확인하면 현황판에 ‘접수’가 체크돼요.</p>
+          <div class="actions" style="justify-content:center">
+            <a class="btn" href="/board.html">현황판에서 확인하기</a>
+            <button class="btn ghost" type="button" id="again">하나 더 요청하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>비품 요청함</span>
+    <span>처리 기간과 담당자 안내는 준비 중이에요.</span>
+  </div>
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const form = $('form');
+
+function kind() { return form.querySelector('input[name=kind]:checked').value; }
+
+function refresh() {
+  const isAS = kind() === 'A/S';
+  $('symptomField').hidden = !isAS;
+  $('itemLabel').textContent = isAS ? '고장 난 장비' : '품목명';
+  $('item').placeholder = isAS ? '예: 3층 회의실 프린터' : '예: A4 복사용지';
+  $('priceLabel').textContent = isAS ? '예상 수리비' : '예상 금액';
+  const p = Number($('price').value);
+  $('approvalNotice').hidden = !(p >= 200000);
+}
+form.addEventListener('change', refresh);
+$('price').addEventListener('input', refresh);
+refresh();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = $('err');
+  err.hidden = true;
+  const data = {
+    name: $('name').value,
+    dept: $('dept').value,
+    contact: $('contact').value,
+    kind: kind(),
+    item: $('item').value,
+    qty: Number($('qty').value) || 1,
+    price: $('price').value === '' ? null : Number($('price').value),
+    symptom: kind() === 'A/S' ? $('symptom').value : '',
+    need_by: $('needBy').value || null,
+    website: $('website').value,
+    consent: $('consent').checked,
+  };
+  const btn = $('submit');
+  btn.disabled = true;
+  btn.textContent = '보내는 중…';
+  try {
+    const r = await fetch('/api/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || '보내지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+    form.hidden = true;
+    $('done').hidden = false;
+  } catch (ex) {
+    err.textContent = ex.message || '보내지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+    err.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '요청 보내기';
+  }
+});
+
+$('again').addEventListener('click', () => {
+  ['item', 'price', 'symptom', 'needBy'].forEach((id) => { $(id).value = ''; });
+  $('qty').value = 1;
+  $('done').hidden = true;
+  form.hidden = false;
+  refresh();
+  $('item').focus();
+});
+</script>
+</body>
+</html>

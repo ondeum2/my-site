@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>관리자 · 비품 요청함</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1b1e24; --paper:#f7f4ee; --card:#fffdf9; --line:#e3dccd; --muted:#6d6a63; --gold:#a5824a; --gold-soft:#f1e8d6; --ok:#2f6b4f; --ok-soft:#e3efe7; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Noto Sans KR", system-ui, sans-serif; word-break: keep-all; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 60px; }
+  h1 { font-family: "Noto Serif KR", serif; font-weight: 600; font-size: 24px; margin: 32px 0 20px; }
+  button { font: inherit; cursor: pointer; }
+  .login { max-width: 360px; margin: 18vh auto 0; padding: 0 16px; }
+  .login input { width: 100%; min-height: 52px; padding: 0 14px; border: 1px solid var(--line); border-radius: 2px; font-size: 16px; background: #fff; }
+  .login input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  .btn { min-height: 52px; padding: 0 22px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 2px; }
+  .login .btn { width: 100%; margin-top: 12px; }
+  .err { color: #9b2c2c; margin: 12px 0 0; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat { background: var(--card); border: 1px solid var(--line); padding: 16px; }
+  .stat b { display: block; font-family: "Noto Serif KR", serif; font-size: 36px; line-height: 1.2; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .filters button { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); background: #fff; border-radius: 2px; }
+  .filters button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 18px; margin-bottom: 12px; }
+  .meta { color: var(--muted); font-size: 14px; }
+  .item { font-size: 18px; font-weight: 600; margin: 4px 0; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border: 1px solid var(--gold); color: #8a5a1c; border-radius: 2px; margin-left: 4px; vertical-align: 2px; font-weight: 500; }
+  .who { margin: 8px 0; font-size: 15px; }
+  .copy { border: 0; background: none; padding: 0; text-decoration: underline dotted; color: inherit; }
+  .sym { background: #fff; border-left: 3px solid var(--line); padding: 8px 12px; margin: 8px 0; font-size: 15px; white-space: pre-wrap; }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .check { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; border: 1px solid var(--line); background: #fff; border-radius: 2px; font-weight: 500; }
+  .check.on { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+  .check i { font-style: normal; display: inline-flex; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 3px; align-items: center; justify-content: center; font-size: 14px; }
+  .tag.late { border-color: #9b2c2c; color: #9b2c2c; }
+  .del-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+  .del-row button { min-height: 40px; padding: 0 14px; border-radius: 2px; font-size: 14px; }
+  .del { border: 0; background: none; color: var(--muted); text-decoration: underline; }
+  .del-row .ask, .del-row .del-yes, .del-row .del-no { display: none; }
+  .del-row.asking .del { display: none; }
+  .del-row.asking .ask { display: block; flex: 1 1 100%; text-align: right; font-size: 14px; color: #9b2c2c; }
+  .del-row.asking .del-yes { display: inline-block; border: 1px solid #9b2c2c; background: #9b2c2c; color: #fff; }
+  .del-row.asking .del-no { display: inline-block; border: 1px solid var(--line); background: #fff; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  .bar { display: flex; justify-content: space-between; align-items: center; }
+  .bar a, .bar button { font-size: 14px; color: var(--muted); background: none; border: 0; }
+</style>
+</head>
+<body>
+<form class="login" id="login">
+  <h1>관리자</h1>
+  <input type="password" id="pw" placeholder="관리자 비밀번호" autocomplete="current-password" aria-label="관리자 비밀번호">
+  <button class="btn" type="submit">들어가기</button>
+  <p class="err" id="loginErr" hidden></p>
+</form>
+
+<div class="wrap" id="app" hidden>
+  <div class="bar">
+    <h1>비품 요청 관리</h1>
+    <button type="button" id="logout">나가기</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="nNew">0</b><span>접수 안 한 요청</span></div>
+    <div class="stat"><b id="nWait">0</b><span>도착 기다리는 요청</span></div>
+  </div>
+  <div class="filters" id="filters">
+    <button type="button" data-f="new">접수 전</button>
+    <button type="button" data-f="wait">도착 대기</button>
+    <button type="button" data-f="done">도착 완료</button>
+    <button type="button" data-f="all" class="on">전체</button>
+  </div>
+  <p class="err" id="appErr" hidden></p>
+  <div id="list"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const won = (n) => n == null ? '' : `${Number(n).toLocaleString('ko-KR')}원`;
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const when = (iso) => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+let rows = [];
+let filter = 'all';
+
+const pw = () => sessionStorage.getItem('adminPw') || '';
+
+async function api(method, body, query = '') {
+  const r = await fetch('/api/admin' + query, {
+    method,
+    headers: { 'x-admin-password': pw(), ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { showLogin('비밀번호가 맞지 않아요.'); throw new Error(''); }
+  if (!r.ok) throw new Error(j.error || '문제가 생겼어요.');
+  return j;
+}
+
+function showLogin(msg) {
+  sessionStorage.removeItem('adminPw');
+  $('app').hidden = true;
+  $('login').hidden = false;
+  $('loginErr').textContent = msg || '';
+  $('loginErr').hidden = !msg;
+  $('pw').value = '';
+  $('pw').focus();
+}
+
+async function load() {
+  try {
+    const j = await api('GET');
+    rows = j.rows || [];
+    $('login').hidden = true;
+    $('app').hidden = false;
+    $('appErr').hidden = true;
+    render();
+  } catch (e) {
+    if (e.message) { $('appErr').textContent = e.message; $('appErr').hidden = false; }
+  }
+}
+
+function render() {
+  $('nNew').textContent = rows.filter((r) => !r.received).length;
+  $('nWait').textContent = rows.filter((r) => r.received && !r.arrived).length;
+  const shown = rows.filter((r) =>
+    filter === 'new' ? !r.received : filter === 'wait' ? r.received && !r.arrived : filter === 'done' ? r.arrived : true);
+  if (!shown.length) { $('list').innerHTML = '<p class="empty">해당하는 요청이 없어요.</p>'; return; }
+  $('list').innerHTML = shown.map((r) => `
+    <div class="card">
+      <div class="meta">${when(r.created_at)} · ${esc(r.kind)}${(r.price ?? 0) >= 200000 ? '<span class="tag">대표 승인 필요</span>' : ''}${r.need_by && r.need_by < today() && !r.arrived ? '<span class="tag late">기한 지남</span>' : ''}</div>
+      <div class="item">${esc(r.item)} × ${r.qty}</div>
+      <div class="meta">${r.price != null ? `예상 ${won(r.price)}` : '금액 미기재'}${r.need_by ? ` · ${esc(r.need_by)}까지 필요` : ''}</div>
+      <div class="who">${esc(r.dept)} · ${esc(r.name)} · <button type="button" class="copy" data-copy="${esc(r.contact)}">${esc(r.contact)}</button></div>
+      ${r.symptom ? `<div class="sym">${esc(r.symptom)}</div>` : ''}
+      <div class="checks">
+        <button type="button" class="check ${r.received ? 'on' : ''}" data-id="${r.id}" data-field="received" data-value="${!r.received}"><i>${r.received ? '✔' : ''}</i>접수</button>
+        <button type="button" class="check ${r.arrived ? 'on' : ''}" data-id="${r.id}" data-field="arrived" data-value="${!r.arrived}"><i>${r.arrived ? '✔' : ''}</i>도착</button>
+      </div>
+      <div class="del-row" data-id="${r.id}">
+        <button type="button" class="del">삭제</button>
+        <span class="ask">이 요청을 삭제할까요? 되돌릴 수 없어요.</span>
+        <button type="button" class="del-yes">삭제</button>
+        <button type="button" class="del-no">취소</button>
+      </div>
+    </div>`).join('');
+}
+
+$('login').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (!$('pw').value) return;
+  sessionStorage.setItem('adminPw', $('pw').value);
+  load();
+});
+$('logout').addEventListener('click', () => showLogin());
+$('filters').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-f]');
+  if (!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll('#filters button').forEach((x) => x.classList.toggle('on', x === b));
+  render();
+});
+$('list').addEventListener('click', async (e) => {
+  const copy = e.target.closest('.copy');
+  if (copy) {
+    try { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = '복사했어요'; setTimeout(render, 1200); }
+    catch { const s = getSelection(); const r = document.createRange(); r.selectNodeContents(copy); s.removeAllRanges(); s.addRange(r); }
+    return;
+  }
+  // 삭제: 한 번 더 확인한 뒤에만 지운다
+  const row = e.target.closest('.del-row');
+  if (row) {
+    if (e.target.closest('.del')) { row.classList.add('asking'); return; }
+    if (e.target.closest('.del-no')) { row.classList.remove('asking'); return; }
+    const yes = e.target.closest('.del-yes');
+    if (!yes) return;
+    yes.disabled = true;
+    try {
+      await api('DELETE', { id: Number(row.dataset.id) }, '?id=' + Number(row.dataset.id));
+      await load();
+    } catch (ex) {
+      if (ex.message) { $('appErr').textContent = ex.message; $('appErr').hidden = false; }
+      yes.disabled = false;
+    }
+    return;
+  }
+  const b = e.target.closest('.check');
+  if (!b) return;
+  b.disabled = true;
+  try {
+    await api('PATCH', { id: Number(b.dataset.id), field: b.dataset.field, value: b.dataset.value === 'true' });
+    await load();
+  } catch (ex) {
+    if (ex.message) { $('appErr').textContent = ex.message; $('appErr').hidden = false; }
+    b.disabled = false;
+  }
+});
+
+if (pw()) load(); else $('pw').focus();
+</script>
+</body>
+</html>
