@@ -343,14 +343,11 @@
         <div id="orderPart" class="stack">
           <h2>주문 품목</h2>
           <div class="entry" id="entry">
-            <input data-e="name" list="dlName" placeholder="품목" aria-label="품목" autocomplete="off">
-            <input data-e="spec" list="dlSpec" placeholder="규격" aria-label="규격" autocomplete="off">
+            <div class="combo"><input data-e="name" placeholder="품목" aria-label="품목" autocomplete="off"><ul class="combo-list" data-for="name" hidden></ul></div>
+            <div class="combo"><input data-e="spec" placeholder="규격" aria-label="규격" autocomplete="off"><ul class="combo-list" data-for="spec" hidden></ul></div>
             <input data-e="qty" placeholder="수량" aria-label="수량" autocomplete="off">
             <button type="button" class="btn" id="addItem">추가</button>
           </div>
-          <div id="picks" class="picks" hidden></div>
-          <datalist id="dlName"></datalist>
-          <datalist id="dlSpec"></datalist>
           <p class="muted small hint">한 줄 쓰고 <kbd>Enter</kbd>를 누르면 아래에 쌓여요. 품목은 그대로 남으니 규격·수량만 바꿔 다시 <kbd>Enter</kbd>.</p>
           <table class="items-table">
             <thead><tr><th class="no">No</th><th>품목</th><th>규격</th><th class="qty">수량</th><th></th></tr></thead>
@@ -396,48 +393,57 @@
       const v = curVendor();
       return v ? v.catalog : state.vendors.flatMap((x) => x.catalog || []);
     };
-    const fillOptions = (el, values) => { el.innerHTML = values.map((x) => `<option value="${esc(x)}"></option>`).join(''); };
-    const refreshNames = () => fillOptions($('#dlName'), uniq(catalog().map((c) => c.name)));
-    const refreshSpecs = () => {
-      const n = entry('name').value.trim();
+    // 콤보박스: 칸을 누르면 고른 업체의 품목(또는 그 품목의 규격) 목록이 펼쳐진다
+    const options = (k) => {
       const cat = catalog();
-      const specs = cat.filter((c) => !n || c.name === n).map((c) => c.spec);
-      fillOptions($('#dlSpec'), uniq(specs));
+      const n = entry('name').value.trim();
+      if (k === 'name') {
+        const q = n.toLowerCase();
+        const names = uniq(cat.map((c) => c.name));
+        const hit = names.filter((x) => x.toLowerCase().includes(q));
+        return hit.length ? hit : names;
+      }
+      const specs = uniq(cat.filter((c) => !n || c.name === n).map((c) => c.spec));
+      const q = entry('spec').value.trim().toLowerCase();
+      const hit = specs.filter((x) => x.toLowerCase().includes(q));
+      return hit.length ? hit : specs;
     };
-    // 고른 업체의 취급 품목을 버튼으로 보여 준다 (누르면 품목·규격이 채워짐)
-    const drawPicks = () => {
-      const v = curVendor();
-      const box = $('#picks');
-      if (!v) { box.hidden = true; return; }
-      const n = entry('name').value.trim().toLowerCase();
-      const cat = v.catalog || [];
-      const shown = cat.filter((c) => !n || c.name.toLowerCase().includes(n));
-      box.hidden = false;
-      box.innerHTML = cat.length
-        ? `<p class="picks-title">${esc(v.name)} 취급 품목 <em>눌러서 담기</em></p>
-           <div class="picks-list">${(shown.length ? shown : cat).map((c) => `<button type="button" class="pick" data-name="${esc(c.name)}" data-spec="${esc(c.spec)}">${esc(c.name)}${c.spec ? ` <small>${esc(c.spec)}</small>` : ''}</button>`).join('')}</div>`
-        : `<p class="picks-title">${esc(v.name)}에 등록된 품목이 없어요. <a href="#/vendors">거래처</a>에서 고치기 → 취급 품목을 등록하면 여기에 보여요.</p>`;
+    const openCombo = (k) => {
+      const ul = $(`.combo-list[data-for=${k}]`, f);
+      const list = options(k);
+      if (!list.length) { ul.hidden = true; return; }
+      ul.innerHTML = list.map((x) => `<li data-v="${esc(x)}">${esc(x)}</li>`).join('');
+      ul.hidden = false;
     };
+    const closeCombos = () => $$('.combo-list', f).forEach((ul) => { ul.hidden = true; });
+    ['name', 'spec'].forEach((k) => {
+      entry(k).addEventListener('focus', () => openCombo(k));
+      entry(k).addEventListener('click', () => openCombo(k));
+      entry(k).addEventListener('input', () => openCombo(k));
+      entry(k).addEventListener('blur', () => setTimeout(() => { $(`.combo-list[data-for=${k}]`, f).hidden = true; }, 150));
+    });
+    $$('.combo-list', f).forEach((ul) => ul.addEventListener('mousedown', (e) => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      e.preventDefault();
+      const k = ul.dataset.for;
+      entry(k).value = li.dataset.v;
+      ul.hidden = true;
+      // 품목을 고르면 규격으로, 규격을 고르면 수량으로
+      const next = k === 'name' ? 'spec' : 'qty';
+      if (k === 'name') entry('spec').value = '';
+      entry(next).focus();
+      if (k === 'name') openCombo('spec');
+    }));
     const syncVendor = () => {
       $('#newVendor').hidden = f.vendor_sel.value !== 'new';
       const v = curVendor();
       const note = $('#vendorNote');
       note.innerHTML = vendorMemo(v);
       note.hidden = !note.innerHTML;
-      refreshNames();
-      refreshSpecs();
-      drawPicks();
+      closeCombos();
     };
     f.vendor_sel.addEventListener('change', syncVendor);
-    entry('name').addEventListener('input', () => { refreshSpecs(); drawPicks(); });
-    $('#picks').addEventListener('click', (e) => {
-      const b = e.target.closest('.pick');
-      if (!b) return;
-      entry('name').value = b.dataset.name;
-      entry('spec').value = b.dataset.spec;
-      refreshSpecs();
-      entry('qty').focus();
-    });
 
     // --- 주문 품목 쌓기 ---
     const drawItems = () => {
@@ -464,6 +470,7 @@
       entry('spec').value = '';
       entry('qty').value = '';
       entry('spec').focus();
+      closeCombos();
       return true;
     };
     $('#addItem').addEventListener('click', () => addEntry());
@@ -749,7 +756,7 @@
             <button type="button" class="btn" id="cAdd">추가</button>
           </div>
           <datalist id="dlCatName"></datalist>
-          <p class="muted small hint">한 줄 쓰고 <kbd>Enter</kbd>를 누르면 아래에 쌓여요. 같은 품목은 그대로 남아요.</p>
+          <p class="muted small hint">한 줄 쓰고 <kbd>Enter</kbd>를 누르면 아래에 쌓이고 <b>바로 저장돼요</b>. 같은 품목은 그대로 남아요. <span id="saveState" class="save-state"></span></p>
           <details class="bulk">
             <summary>여러 줄 한꺼번에 붙여넣기</summary>
             <textarea id="bulk" placeholder="한 줄에 하나씩: 품목, 규격&#10;예) 비닐, 0.05mm×1.8m&#10;엑셀에서 두 칸을 복사해 붙여넣어도 돼요"></textarea>
@@ -768,8 +775,9 @@
           <button class="btn primary" type="submit">거래처 저장</button>
         </div>
       </form>
-      <div id="vlist" class="list" style="margin-top:18px">
-        ${state.vendors.length ? state.vendors.map((v) => `
+      <div id="vlist" class="list" style="margin-top:18px"></div>`;
+
+    const drawList = () => { $('#vlist').innerHTML = state.vendors.length ? state.vendors.map((v) => `
           <div class="item vendor">
             <div class="grow">
               <div class="item-title">${v.prepaid ? '<span class="star">★</span> ' : ''}${esc(v.name)} ${v.prefer ? `<span class="badge">${v.prefer === '문자' ? '카톡·문자' : '문서'}</span>` : ''}</div>
@@ -782,8 +790,8 @@
               <button class="btn sm" data-edit="${v.id}">고치기</button>
               <button class="btn sm danger" data-del="${v.id}">지우기</button>
             </div>
-          </div>`).join('') : '<div class="empty">저장한 거래처가 없어요.</div>'}
-      </div>`;
+          </div>`).join('') : '<div class="empty">저장한 거래처가 없어요.</div>'; };
+    drawList();
 
     const f = $('#vf');
     let editId = null;
@@ -800,6 +808,46 @@
       $('#noCat').hidden = cat.length > 0;
       $('#dlCatName').innerHTML = uniq(cat.map((c) => c.name)).map((n) => `<option value="${esc(n)}"></option>`).join('');
     };
+    const formBody = () => ({
+      name: f.name.value.trim(),
+      contact_person: f.contact_person.value.trim(),
+      phone: f.phone.value.trim(),
+      prefer: f.prefer.value,
+      prepaid: f.prepaid.checked,
+      memo: f.memo.value.trim(),
+      catalog: cat.map((c) => ({ name: (c.name || '').trim(), spec: (c.spec || '').trim() })).filter((c) => c.name),
+    });
+    let saving = Promise.resolve();
+    // 서버에 저장. 업체 이름이 없으면 저장하지 않고 알려 준다
+    const saveVendor = (auto) => {
+      saving = saving.then(async () => {
+        const msg = $('#vfMsg');
+        const body = formBody();
+        if (!body.name) {
+          msg.textContent = auto ? '업체 이름을 먼저 적어 주세요. 이름이 있어야 품목이 저장돼요.' : '업체 이름을 적어 주세요.';
+          msg.hidden = false;
+          return false;
+        }
+        msg.hidden = true;
+        try {
+          if (editId) {
+            const { row } = await api('PATCH', 'vendors', { id: editId, body });
+            Object.assign(findVendor(editId), row || body);
+          } else {
+            const { row } = await api('POST', 'vendors', { body });
+            state.vendors.push({ catalog: [], ...row });
+            editId = row.id;
+            $('#vfTitle').textContent = `거래처 고치기 — ${row.name}`;
+            $('#vfCancel').hidden = false;
+          }
+          state.vendors.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+          drawList();
+          $('#saveState').textContent = `취급 품목 ${body.catalog.length}개 저장됨`;
+          return true;
+        } catch (err) { fail(err); msg.textContent = err.message; msg.hidden = false; return false; }
+      });
+      return saving;
+    };
     let lastCatName = '';
     const addCat = (fromSubmit) => {
       const c = { name: cin('name').value.trim(), spec: cin('spec').value.trim() };
@@ -812,6 +860,7 @@
       drawCat();
       cin('spec').value = '';
       cin('spec').focus();
+      if (fromSubmit !== true) saveVendor(true);
     };
     $('#cAdd').addEventListener('click', () => addCat());
     $('#bulkAdd').addEventListener('click', () => {
@@ -820,6 +869,7 @@
       drawCat();
       $('#bulk').value = '';
       toast(`${add.length}개를 넣었어요`);
+      if (add.length) saveVendor(true);
     });
     $('#crows').addEventListener('input', (e) => {
       const tr = e.target.closest('tr');
@@ -829,7 +879,10 @@
       if (!e.target.closest('[data-cdel]')) return;
       cat.splice(Number(e.target.closest('tr').dataset.i), 1);
       drawCat();
+      saveVendor(true);
     });
+    // 줄에서 고친 품목·규격은 칸을 벗어날 때 저장
+    $('#crows').addEventListener('change', () => saveVendor(true));
     f.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' || e.isComposing || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
       e.preventDefault();
@@ -841,6 +894,7 @@
       cat = [];
       f.reset();
       drawCat();
+      $('#saveState').textContent = '';
       $('#vfTitle').textContent = '새 거래처';
       $('#vfCancel').hidden = true;
     };
@@ -857,6 +911,7 @@
         f.prepaid.checked = !!v.prepaid;
         cat = (v.catalog || []).map((c) => ({ ...c }));
         drawCat();
+        $('#saveState').textContent = `취급 품목 ${cat.length}개 저장됨`;
         $('#vfTitle').textContent = `거래처 고치기 — ${v.name}`;
         $('#vfCancel').hidden = false;
         f.scrollIntoView({ behavior: 'smooth' });
@@ -878,30 +933,7 @@
     f.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       addCat(true); // 입력 줄에 남은 품목도 담기
-      const msg = $('#vfMsg');
-      const body = {
-        name: f.name.value.trim(),
-        contact_person: f.contact_person.value.trim(),
-        phone: f.phone.value.trim(),
-        prefer: f.prefer.value,
-        prepaid: f.prepaid.checked,
-        memo: f.memo.value.trim(),
-        catalog: cat.map((c) => ({ name: c.name.trim(), spec: (c.spec || '').trim() })).filter((c) => c.name),
-      };
-      if (!body.name) { msg.textContent = '업체 이름을 적어 주세요.'; msg.hidden = false; return; }
-      msg.hidden = true;
-      try {
-        if (editId) {
-          const { row } = await api('PATCH', 'vendors', { id: editId, body });
-          Object.assign(findVendor(editId), row || body);
-        } else {
-          const { row } = await api('POST', 'vendors', { body });
-          state.vendors.push({ catalog: [], ...row });
-        }
-        state.vendors.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-        toast('저장했어요');
-        render();
-      } catch (err) { fail(err); msg.textContent = err.message; msg.hidden = false; }
+      if (await saveVendor(false)) { toast('저장했어요'); render(); }
     });
   }
 
@@ -963,7 +995,7 @@
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '3';
+  const VERSION = '5';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {

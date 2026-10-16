@@ -310,3 +310,15 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 .pick { min-height: 36px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 999px; background: #fff; font: inherit; font-size: .875rem; cursor: pointer; color: var(--text); }
 .pick:hover { border-color: var(--gold); background: var(--gold-weak); }
 .pick small { color: var(--muted); }
+.save-state { color: var(--done); font-weight: 700; margin-left: 6px; }
+
+/* 품목·규격 콤보박스 */
+.combo { position: relative; }
+.combo input { padding-right: 32px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236f7482' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 12px center; }
+.combo-list {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20;
+  margin: 0; padding: 4px; list-style: none; max-height: 240px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: 0 12px 28px -12px rgba(22,33,58,.35);
+}
+.combo-list li { padding: 9px 12px; border-radius: 6px; cursor: pointer; }
+.combo-list li:hover { background: var(--gold-weak); }
