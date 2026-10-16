@@ -324,3 +324,10 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 .combo-list li:hover { background: var(--gold-weak); }
 .item-actions { display: flex; gap: 6px; align-items: center; }
 @media (max-width: 640px) { .item-actions { justify-content: space-between; } }
+
+/* 화면 안 확인창 */
+.ask { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(15, 22, 40, .55); }
+.ask-card { width: 100%; max-width: 420px; background: #fff; border-radius: 14px; padding: 24px; border-top: 3px solid var(--gold); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
+.ask-msg { margin: 0 0 20px; white-space: pre-line; font-size: 1rem; line-height: 1.6; }
+.btn.danger-fill { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn.danger-fill:hover { filter: brightness(1.08); }

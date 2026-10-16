@@ -111,6 +111,26 @@
     toast(e && e.message ? e.message : '문제가 생겼어요.');
   }
 
+  // ---------- 확인창 (브라우저 기본 창 대신 화면 안에 띄움) ----------
+  function ask(message, okLabel = '지우기') {
+    return new Promise((resolve) => {
+      const box = $('#ask');
+      $('#askMsg').textContent = message;
+      $('#askOk').textContent = okLabel;
+      box.hidden = false;
+      $('#askCancel').focus();
+      const done = (v) => {
+        box.hidden = true;
+        $('#askOk').onclick = $('#askCancel').onclick = box.onclick = document.onkeydown = null;
+        resolve(v);
+      };
+      $('#askOk').onclick = () => done(true);
+      $('#askCancel').onclick = () => done(false);
+      box.onclick = (e) => { if (e.target === box) done(false); };
+      document.onkeydown = (e) => { if (e.key === 'Escape') done(false); };
+    });
+  }
+
   // ---------- 잠금 ----------
   function lock(msg) {
     session.clear();
@@ -211,7 +231,7 @@
   async function deleteOrder(id) {
     const o = findOrder(id);
     if (!o) return false;
-    if (!confirm(`이 발주서를 지울까요?
+    if (!await ask(`이 발주서를 지울까요?
 
 ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
@@ -944,7 +964,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
       }
       if (del) {
         const v = findVendor(del.dataset.del);
-        if (!confirm(`'${v.name}'을(를) 거래처 목록에서 지울까요?\n이미 만든 발주서는 그대로 남아요.`)) return;
+        if (!await ask(`'${v.name}'을(를) 거래처 목록에서 지울까요?\n이미 만든 발주서는 그대로 남아요.`)) return;
         try {
           await api('DELETE', 'vendors', { id: v.id });
           state.vendors = state.vendors.filter((x) => x.id !== v.id);
@@ -1007,7 +1027,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
     });
     $('#logout').addEventListener('click', async () => {
       if (DEMO) {
-        if (!confirm('체험으로 넣은 내용을 모두 비울까요?')) return;
+        if (!await ask('체험으로 넣은 내용을 모두 비울까요?', '비우기')) return;
         try { localStorage.removeItem('po_demo_data'); } catch { /* 무시 */ }
         await loadAll();
         location.hash = '#/';
@@ -1020,7 +1040,7 @@ ${fmtDate(o.order_date)} · ${o.vendor_name} · ${summary(o)}
 
   // ---------- 새 버전 확인 ----------
   // 창을 다시 볼 때 새 버전이 올라와 있으면 새로고침한다 (작성 중인 화면에서는 하지 않음)
-  const VERSION = '6';
+  const VERSION = '7';
   document.addEventListener('visibilitychange', async () => {
     if (document.hidden || DEMO || ['new', 'edit'].includes(route().name)) return;
     try {

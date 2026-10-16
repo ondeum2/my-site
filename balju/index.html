@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&display=swap">
-  <link rel="stylesheet" href="/balju/assets/style.css?v=6">
+  <link rel="stylesheet" href="/balju/assets/style.css?v=7">
 </head>
 <body>
   <!-- 잠금 화면 -->
@@ -39,7 +39,17 @@
     <main id="app" class="wrap"></main>
   </div>
 
+  <div id="ask" class="ask no-print" role="dialog" aria-modal="true" aria-labelledby="askMsg" hidden>
+    <div class="ask-card">
+      <p id="askMsg" class="ask-msg"></p>
+      <div class="row end">
+        <button type="button" class="btn" id="askCancel">취소</button>
+        <button type="button" class="btn danger-fill" id="askOk">지우기</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast no-print" role="status" hidden></div>
-  <script src="/balju/assets/app.js?v=6"></script>
+  <script src="/balju/assets/app.js?v=7"></script>
 </body>
 </html>
